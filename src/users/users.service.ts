@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import { UserResponseDto } from './dto/user-response.dto';
 
 @Injectable()
 export class UsersService {
@@ -36,12 +37,13 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  async findOne(id: number): Promise<User> {
-    const user = await this.usersRepository.findOne({ where: { id } });
+  async findOne(id: number): Promise<UserResponseDto> {
+    const user = await this.usersRepository.findOne({ where: { id: id } });
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');
     }
-    return user;
+    const { password, ...userWithoutPassword} = user;
+    return userWithoutPassword as UserResponseDto;
   }
 
   async findByEmail(email: string): Promise<User> {
@@ -59,7 +61,6 @@ export class UsersService {
     if (!isPasswordValid) {
       throw new NotFoundException('Credenciales inválidas');
     }
-    
     return user;
   }
 } 

@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
+import { UserResponseDto } from './dto/user-response.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -45,7 +46,7 @@ export class UsersController {
   @ApiResponse({ 
     status: 200, 
     description: 'Usuario encontrado',
-    type: User
+    type: UserResponseDto
   })
   @ApiResponse({ 
     status: 404, 

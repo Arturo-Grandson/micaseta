@@ -1,11 +1,9 @@
 import { User } from "../../users/entities/user.entity";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { Booth } from "./booth.entity";
-import { FestiveTypeEnum } from "../../enums/enums";
-
 
 @Entity()
-@Unique(['user', 'booth', 'festivalType', 'year'])
+@Unique(['user', 'booth'])
 export class BoothMember {
   @PrimaryGeneratedColumn()
   id: number;
@@ -18,13 +16,5 @@ export class BoothMember {
   
   @ManyToOne(() => Booth, (booth) => booth.boothMemberships)
   booth: Booth;
-  
-  @Column({ type: 'enum', enum: FestiveTypeEnum})
-  festivalType: FestiveTypeEnum;
-
-  @Column()
-  year: number;
-  
-  
-  
+    
 }
