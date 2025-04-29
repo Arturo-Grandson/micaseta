@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -18,7 +22,9 @@ export class UsersService {
     const { email, password } = createUserDto;
 
     // Verificar si el usuario ya existe
-    const existingUser = await this.usersRepository.findOne({ where: { email } });
+    const existingUser = await this.usersRepository.findOne({
+      where: { email },
+    });
     if (existingUser) {
       throw new ConflictException('El email ya está registrado');
     }
@@ -43,7 +49,7 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');
     }
-    const { password, ...userWithoutPassword} = user;
+    const { password, ...userWithoutPassword } = user;
     return userWithoutPassword as UserResponseDto;
   }
 
@@ -56,9 +62,15 @@ export class UsersService {
   }
 
   async validateUser(email: string, password: string): Promise<User> {
-    const user = await this.findByEmail(email);
+    const user = await this.usersRepository.findOne({
+      where: { email },
+      relations: ['boothMembers', 'boothMembers.booth'],
+    });
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    
+
     if (!isPasswordValid) {
       throw new NotFoundException('Credenciales inválidas');
     }

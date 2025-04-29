@@ -2,8 +2,16 @@ import { BoothMember } from '@/booth/entities/booth-member.entity';
 import { BoothRole } from '@/booth/entities/booth-role.entity';
 import { Consumption } from '@/consumption/entities/consumption.entity';
 import { CommonExpenseParticipant } from '@/expenses/entities/expenses-participant.entity';
+import { OptionalExpenseParticipant } from '@/expenses/entities/optional-expense-participant.entity';
 import { Penalty } from '@/penalty/entities/penalty.entity';
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToMany, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -46,6 +54,9 @@ export class User {
   @OneToMany(() => BoothMember, (boothMember) => boothMember.user)
   boothMembers: BoothMember[];
 
-  @OneToMany(() => CommonExpenseParticipant, cep => cep.user)
+  @OneToMany(() => CommonExpenseParticipant, (cep) => cep.user)
   commonExpenseParticipants: CommonExpenseParticipant[];
+
+  @OneToMany(() => OptionalExpenseParticipant, (oep) => oep.user)
+  optionalExpenseParticipants: OptionalExpenseParticipant[];
 }

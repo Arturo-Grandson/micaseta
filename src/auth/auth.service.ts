@@ -11,12 +11,19 @@ export class AuthService {
   ) {}
 
   async validateUser(loginDto: LoginDto) {
-    const user = await this.usersService.validateUser(loginDto.email, loginDto.password);
+    const user = await this.usersService.validateUser(
+      loginDto.email,
+      loginDto.password,
+    );
     return user;
   }
 
   async login(user: any) {
     const payload = { email: user.email, sub: user.id };
+
+    // Obtener el boothId del primer booth al que pertenece el usuario
+    const boothId = user.boothMembers?.[0]?.booth?.id;
+
     return {
       access_token: this.jwtService.sign(payload),
       user: {
@@ -25,7 +32,8 @@ export class AuthService {
         lastname: user.lastname,
         email: user.email,
         phone: user.phone,
+        boothId: boothId || null,
       },
     };
   }
-} 
+}
