@@ -1,18 +1,17 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { CreateConsumptionDto } from './dto/create-consumption.dto';
 import { ConsumptionService } from './consumption.service';
-import { FestiveTypeEnum } from '@/enums/enums';
 
+@ApiTags('consumption')
 @Controller('consumption')
 export class ConsumptionController {
   constructor(private readonly consumptionService: ConsumptionService) {}
 
-  @Get('user/:userId/booth/:boothId/year/:year/festivalType/:festivalType')
-  async getAllConsumptionsAndPricesByUserIdAndBoothId(
-    @Param('userId') userId: number,
-    @Param('boothId') boothId: number,
-    @Param('year') year: number,
-    @Param('festivalType') festivalType: FestiveTypeEnum
+  @Post()
+  async createConsumptionByUser(
+    @Body() createConsumptionDto: CreateConsumptionDto,
   ) {
-    return this.consumptionService.getAllConsumptionsAndPricesByUserIdAndBoothId(userId, boothId, year, festivalType);
+    return this.consumptionService.createConsumption(createConsumptionDto);
   }
 }

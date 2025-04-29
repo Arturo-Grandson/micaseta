@@ -1,23 +1,21 @@
-import { User } from "src/users/entities/user.entity";
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from "typeorm";
-import { Booth } from "./booth.entity";
-import { BoothRoleTypeEnum, FestiveTypeEnum } from "src/enums/enums";
-
-
+import { User } from 'src/users/entities/user.entity';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from 'typeorm';
+import { Booth } from './booth.entity';
+import { BoothRoleTypeEnum, FestiveTypeEnum } from 'src/enums/enums';
 
 @Entity()
 export class BoothRole {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, u => u.boothRoles)
+  @ManyToOne(() => User, (u) => u.boothRoles)
   user: User;
 
-  @ManyToOne(() => Booth, b => b.boothRoles)
+  @ManyToOne(() => Booth, (b) => b.boothRoles)
   booth: Booth;
 
   @Column({ type: 'enum', enum: FestiveTypeEnum })
-  festivalType: FestiveTypeEnum;
+  festiveType: FestiveTypeEnum;
 
   @Column()
   year: number;

@@ -1,26 +1,25 @@
-import { Booth } from "src/booth/entities/booth.entity";
-import { FestiveTypeEnum } from "src/enums/enums";
-import { Product } from "src/product/entities/product.entity";
-import { User } from "src/users/entities/user.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-
+import { Booth } from 'src/booth/entities/booth.entity';
+import { FestiveTypeEnum } from 'src/enums/enums';
+import { Product } from 'src/product/entities/product.entity';
+import { User } from 'src/users/entities/user.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Consumption {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, u => u.consumptions)
+  @ManyToOne(() => User, (u) => u.consumptions)
   user: User;
 
-  @ManyToOne(() => Product, p => p.consumptions)
+  @ManyToOne(() => Product, (p) => p.consumptions)
   product: Product;
 
-  @ManyToOne(() => Booth, b => b.consumptions)
+  @ManyToOne(() => Booth, (b) => b.consumptions)
   booth: Booth;
 
   @Column({ type: 'enum', enum: FestiveTypeEnum })
-  festivalType: FestiveTypeEnum;
+  festiveType: FestiveTypeEnum;
 
   @Column()
   year: number;

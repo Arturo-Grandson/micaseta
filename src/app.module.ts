@@ -20,7 +20,7 @@ import { ProductModule } from './product/product.module';
       port: parseInt(process.env.DB_PORT, 10) || 5432,
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'mysecretpassword',
-      database: process.env.DB_DATABASE || 'my_booth',
+      database: process.env.DB_DATABASE || 'postgres',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true, // En producción debe ser false
     }),

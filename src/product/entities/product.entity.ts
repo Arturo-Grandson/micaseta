@@ -1,11 +1,18 @@
-import { Booth } from "src/booth/entities/booth.entity";
-import { Consumption } from "src/consumption/entities/consumption.entity";
-import { ProductTypeEnum } from "src/enums/enums";
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { ProductPrice } from "./product-price.entity";
-
+import { Booth } from 'src/booth/entities/booth.entity';
+import { Consumption } from 'src/consumption/entities/consumption.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
+import { ProductPrice } from './product-price.entity';
 
 @Entity()
+@Unique(['name', 'booth'])
 export class Product {
   @PrimaryGeneratedColumn()
   id: number;
@@ -16,12 +23,12 @@ export class Product {
   @Column({ type: 'enum', enum: ['drink', 'food'] })
   type: string;
 
-  @ManyToOne(() => Booth, b => b.products)
+  @ManyToOne(() => Booth, (b) => b.products)
   booth: Booth;
 
-  @OneToMany(() => ProductPrice, pp => pp.product)
-  prices: ProductPrice[];
+  @OneToOne(() => ProductPrice, (pp) => pp.product)
+  price: ProductPrice;
 
-  @OneToMany(() => Consumption, c => c.product)
+  @OneToMany(() => Consumption, (c) => c.product)
   consumptions: Consumption[];
 }

@@ -1,21 +1,20 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from "typeorm";
-import { Product } from "./product.entity";
-import { FestiveTypeEnum } from "src/enums/enums";
-
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  Column,
+  JoinColumn,
+} from 'typeorm';
+import { Product } from './product.entity';
 
 @Entity()
 export class ProductPrice {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Product, p => p.prices)
+  @OneToOne(() => Product, (p) => p.price)
+  @JoinColumn()
   product: Product;
-
-  @Column({ type: 'enum', enum: FestiveTypeEnum })
-  festivalType: FestiveTypeEnum;
-
-  @Column()
-  year: number;
 
   @Column('decimal')
   price: number;

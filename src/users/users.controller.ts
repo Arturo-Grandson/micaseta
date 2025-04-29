@@ -2,7 +2,12 @@ import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { User } from './entities/user.entity';
 import { UserResponseDto } from './dto/user-response.dto';
 
@@ -13,14 +18,14 @@ export class UsersController {
 
   @Post()
   @ApiOperation({ summary: 'Crear un nuevo usuario' })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Usuario creado exitosamente',
-    type: User
+    type: User,
   })
-  @ApiResponse({ 
-    status: 409, 
-    description: 'El email ya está registrado' 
+  @ApiResponse({
+    status: 409,
+    description: 'El email ya está registrado',
   })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
@@ -30,10 +35,10 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener todos los usuarios' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Lista de usuarios',
-    type: [User]
+    type: [User],
   })
   findAll() {
     return this.usersService.findAll();
@@ -43,16 +48,16 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener un usuario por ID' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Usuario encontrado',
-    type: UserResponseDto
+    type: UserResponseDto,
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Usuario no encontrado' 
+  @ApiResponse({
+    status: 404,
+    description: 'Usuario no encontrado',
   })
   findOne(@Param('id') id: number) {
     return this.usersService.findOne(id);
   }
-} 
+}

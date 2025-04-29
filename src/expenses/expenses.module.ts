@@ -6,8 +6,10 @@ import { CommonExpense } from './entities/expenses.entity';
 import { CommonExpenseParticipant } from './entities/expenses-participant.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CommonExpense, CommonExpenseParticipant])],
+  imports: [
+    TypeOrmModule.forFeature([CommonExpense, CommonExpenseParticipant]),
+  ],
   controllers: [ExpensesController],
-  providers: [ExpensesService]
+  providers: [ExpensesService],
 })
 export class ExpensesModule {}

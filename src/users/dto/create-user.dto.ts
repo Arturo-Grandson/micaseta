@@ -4,7 +4,7 @@ import { IsString, IsEmail, IsOptional, MinLength } from 'class-validator';
 export class CreateUserDto {
   @ApiProperty({
     description: 'Nombre del usuario',
-    example: 'Juan'
+    example: 'Juan',
   })
   @IsString()
   @MinLength(2)
@@ -12,7 +12,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'Apellido del usuario',
-    example: 'Pérez'
+    example: 'Pérez',
   })
   @IsString()
   @MinLength(2)
@@ -20,7 +20,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'Email del usuario',
-    example: 'juan.perez@example.com'
+    example: 'juan.perez@example.com',
   })
   @IsEmail()
   email: string;
@@ -28,7 +28,7 @@ export class CreateUserDto {
   @ApiProperty({
     description: 'Contraseña del usuario (mínimo 6 caracteres)',
     example: 'password123',
-    minLength: 6
+    minLength: 6,
   })
   @IsString()
   @MinLength(6)
@@ -37,9 +37,9 @@ export class CreateUserDto {
   @ApiProperty({
     description: 'Número de teléfono del usuario (opcional)',
     example: '+34612345678',
-    required: false
+    required: false,
   })
   @IsString()
   @IsOptional()
   phone?: string;
-} 
+}
