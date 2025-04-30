@@ -11,6 +11,17 @@ export class PenaltyService {
     private penaltyRepo: Repository<Penalty>,
   ) {}
 
+  async getPenaltiesByUserIdAndBoothId(userId: number, boothId: number) {
+    const penalties = await this.penaltyRepo.find({
+      where: {
+        user: { id: userId },
+        booth: { id: boothId },
+        year: new Date().getFullYear(),
+      },
+    });
+    return penalties;
+  }
+
   async createPenalty(createPenaltyDto: CreatePenaltyDto) {
     const { festiveType, year, amount, reason, date, userId, boothId } =
       createPenaltyDto;

@@ -17,10 +17,29 @@ export class ExpensesService {
     private boothRepo: Repository<Booth>,
   ) {}
 
+  async getCommonExpensesByBoothIdAndYear(
+    boothId: number,
+    year: number,
+  ): Promise<CommonExpense[]> {
+    let commonExpenses: CommonExpense[] = [];
+    commonExpenses = await this.commonExpensesRepo.find({
+      where: {
+        booth: { id: boothId },
+        year: year,
+      },
+    });
+    return commonExpenses;
+  }
+
   async createCommonExpenses(createCommonExpensesDto: CreateCommonExpensesDto) {
-    const commonExpense = this.commonExpensesRepo.create(
-      createCommonExpensesDto,
-    );
+    const commonExpense = this.commonExpensesRepo.create({
+      festiveType: createCommonExpensesDto.festiveType,
+      year: createCommonExpensesDto.year,
+      description: createCommonExpensesDto.description,
+      totalAmount: createCommonExpensesDto.totalAmount,
+      date: createCommonExpensesDto.date,
+      booth: { id: createCommonExpensesDto.boothId },
+    });
     return this.commonExpensesRepo.save(commonExpense);
   }
 }

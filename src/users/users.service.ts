@@ -9,7 +9,6 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UserResponseDto } from './dto/user-response.dto';
-import { Consumption } from '@/consumption/entities/consumption.entity';
 
 @Injectable()
 export class UsersService {

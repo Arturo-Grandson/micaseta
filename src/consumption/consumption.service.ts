@@ -75,4 +75,17 @@ export class ConsumptionService {
 
     return savedConsumptions;
   }
+
+  async getConsumptionsByUserIdAndBoothId(userId: number, boothId: number) {
+    const consumptions = await this.consumptionRepo.find({
+      where: {
+        user: { id: userId },
+        booth: { id: boothId },
+        year: new Date().getFullYear(),
+      },
+      relations: ['product.price'],
+    });
+
+    return consumptions;
+  }
 }

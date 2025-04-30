@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
 import { CreateCommonExpensesDto } from './dto/create-common-expenses.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -9,6 +9,22 @@ import { CommonExpense } from './entities/expenses.entity';
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
+  @Get('common-expense/:boothId/:year')
+  @ApiOperation({ summary: 'Obtener gastos comunes por año y caseta' })
+  @ApiResponse({
+    status: 200,
+    description: 'Gastos comunes obtenidos exitosamente',
+    type: [CommonExpense],
+  })
+  async getCommonExpensesByUserIdAndBoothId(
+    @Param('boothId') boothId: number,
+    @Param('year') year: number,
+  ) {
+    return this.expensesService.getCommonExpensesByBoothIdAndYear(
+      boothId,
+      year,
+    );
+  }
   @Post('common-expense')
   @ApiOperation({ summary: 'Crear una nueva gasto común' })
   @ApiResponse({

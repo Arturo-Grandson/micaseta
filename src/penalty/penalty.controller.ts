@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { PenaltyService } from './penalty.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePenaltyDto } from './dto/create-penalty.dto';
@@ -8,6 +8,22 @@ import { Penalty } from './entities/penalty.entity';
 @Controller('penalty')
 export class PenaltyController {
   constructor(private readonly penaltyService: PenaltyService) {}
+
+  @Get('user/:userId/booth/:boothId')
+  @ApiOperation({ summary: 'Obtener multas por usuario, caseta y festividad' })
+  @ApiResponse({
+    status: 200,
+    description: 'Multas obtenidas exitosamente',
+  })
+  async getPenaltiesByUserIdAndBoothId(
+    @Param('userId') userId: number,
+    @Param('boothId') boothId: number,
+  ) {
+    return await this.penaltyService.getPenaltiesByUserIdAndBoothId(
+      userId,
+      boothId,
+    );
+  }
 
   @Post()
   @ApiOperation({ summary: 'Crear una multa' })
