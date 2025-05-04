@@ -22,7 +22,7 @@ import { ProductModule } from './product/product.module';
       password: process.env.DB_PASSWORD || 'mysecretpassword',
       database: process.env.DB_DATABASE || 'postgres',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, // En producción debe ser false
+      synchronize: false, // Desactivamos la sincronización
     }),
     UsersModule,
     AuthModule,
