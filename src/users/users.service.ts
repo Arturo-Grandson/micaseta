@@ -73,6 +73,24 @@ export class UsersService {
     if (!isPasswordValid) {
       throw new NotFoundException('Credenciales inválidas');
     }
+
+    // No validamos las casetas aquí, eso lo hace el AuthService
     return user;
+  }
+
+  async getUserBooths(userId: number): Promise<any[]> {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['boothMembers', 'boothMembers.booth'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    return user.boothMembers.map((member) => ({
+      id: member.booth.id,
+      name: member.booth.name,
+    }));
   }
 }

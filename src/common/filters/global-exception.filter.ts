@@ -26,8 +26,20 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       const errorResponse = exception.getResponse();
 
       if (typeof errorResponse === 'object' && errorResponse !== null) {
-        message = (errorResponse as any).message || exception.message;
+        const responseObj = errorResponse as any;
+        message = responseObj.message || exception.message;
         errorName = exception.name;
+        // Preservar datos adicionales del error
+        if (responseObj.booths) {
+          return response.status(status).json({
+            ...responseObj,
+            success: false,
+            statusCode: status,
+            timestamp: new Date().toISOString(),
+            path: request.url,
+            error: errorName,
+          });
+        }
       } else {
         message = String(errorResponse || exception.message);
       }

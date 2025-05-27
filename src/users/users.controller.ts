@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -59,5 +67,21 @@ export class UsersController {
   })
   findOne(@Param('id') id: number) {
     return this.usersService.findOne(id);
+  }
+
+  @Get('me/booths')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Obtener las casetas del usuario autenticado' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de casetas del usuario',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Usuario no encontrado',
+  })
+  async getUserBooths(@Request() req) {
+    return this.usersService.getUserBooths(req.user.id);
   }
 }

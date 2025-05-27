@@ -20,11 +20,52 @@ export class AuthService {
       loginDto.email,
       loginDto.password,
     );
+
+    // Si el usuario no tiene casetas asignadas, esto es un error
+    if (!user.boothMembers || user.boothMembers.length === 0) {
+      throw new UnauthorizedException('El usuario no tiene casetas asignadas');
+    }
+
+    // Verificar si el usuario tiene casetas asignadas
+    if (!user.boothMembers || user.boothMembers.length === 0) {
+      throw new UnauthorizedException('El usuario no tiene casetas asignadas');
+    }
+
+    // Si no se proporcionó boothId, devolver la lista de casetas disponibles
+    if (!loginDto.boothId) {
+      throw new UnauthorizedException({
+        message: 'Por favor, selecciona una caseta para continuar',
+        booths: user.boothMembers.map((member) => ({
+          id: member.booth.id,
+          name: member.booth.name,
+        })),
+      });
+    }
+
+    // Verificar que el usuario tenga acceso a la caseta seleccionada
+    const hasBooth = user.boothMembers.some(
+      (member) => member.booth.id === loginDto.boothId,
+    );
+
+    if (!hasBooth) {
+      throw new UnauthorizedException({
+        message: 'No tienes acceso a esta caseta. Por favor, selecciona otra.',
+        booths: user.boothMembers.map((member) => ({
+          id: member.booth.id,
+          name: member.booth.name,
+        })),
+      });
+    }
+
     return user;
   }
 
-  async login(user: any) {
-    const payload = { email: user.email, sub: user.id };
+  async login(user: any, loginDto: LoginDto) {
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      boothId: loginDto.boothId,
+    };
 
     // Crear un access token
     const accessToken = this.jwtService.sign(payload);
@@ -32,9 +73,6 @@ export class AuthService {
     // Crear un refresh token
     const refreshTokenEntity =
       await this.tokensService.createRefreshToken(user);
-
-    // Obtener el boothId del primer booth al que pertenece el usuario
-    const boothId = user.boothMembers?.[0]?.booth?.id;
 
     return {
       access_token: accessToken,
@@ -45,7 +83,7 @@ export class AuthService {
         lastname: user.lastname,
         email: user.email,
         phone: user.phone,
-        boothId: boothId || null,
+        boothId: loginDto.boothId,
       },
     };
   }
