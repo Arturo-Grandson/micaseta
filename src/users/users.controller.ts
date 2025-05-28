@@ -39,17 +39,17 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Get()
+  @Get('/booth/:boothId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Obtener todos los usuarios' })
+  @ApiOperation({ summary: 'Obtener usuarios de una caseta específica' })
   @ApiResponse({
     status: 200,
-    description: 'Lista de usuarios',
+    description: 'Lista de usuarios de la caseta',
     type: [User],
   })
-  findAll() {
-    return this.usersService.findAll();
+  async findUsersByBoothId(@Param('boothId') boothId: number) {
+    return this.usersService.findUsersByBoothId(boothId);
   }
 
   @Get(':id')

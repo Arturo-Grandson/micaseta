@@ -43,8 +43,22 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
+  async findUsersByBoothId(boothId: number): Promise<User[]> {
+    const users = await this.usersRepository
+      .createQueryBuilder('user')
+      .innerJoin('user.boothMembers', 'boothMember')
+      .innerJoin('boothMember.booth', 'booth')
+      .where('booth.id = :boothId', { boothId })
+      .getMany();
+
+    return users;
+  }
+
   async findOne(id: number): Promise<UserResponseDto> {
-    const user = await this.usersRepository.findOne({ where: { id: id } });
+    const user = await this.usersRepository.findOne({
+      where: { id: id },
+      relations: ['boothMembers', 'boothMembers.booth'],
+    });
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');
     }

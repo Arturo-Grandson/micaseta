@@ -11,20 +11,6 @@ import {
 
 export class CreateProductPriceDto {
   @ApiProperty({
-    description: 'Año del producto',
-    example: 2025,
-  })
-  @IsNumber()
-  year: number;
-
-  @ApiProperty({
-    description: 'ID de la caseta donde se registrará el producto',
-    example: 1,
-  })
-  @IsNumber()
-  boothId: number;
-
-  @ApiProperty({
     description: 'Precio del producto en Euros',
     example: 10,
   })
@@ -58,8 +44,9 @@ export class CreateProductDto {
   @ApiProperty({
     description: 'Precio del producto en Euros',
     example: '{"price": 1.3}',
+    required: false,
   })
   @ValidateNested()
   @Type(() => CreateProductPriceDto)
-  price: CreateProductPriceDto;
+  price?: CreateProductPriceDto;
 }

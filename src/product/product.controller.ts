@@ -25,6 +25,8 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Crear un nuevo Producto' })
   @ApiResponse({
     status: 201,
@@ -32,6 +34,7 @@ export class ProductController {
     type: Product,
   })
   async createProduct(@Body() createProductDto: CreateProductDto) {
+    console.log('Crear producto DTO:', createProductDto);
     return this.productService.createProduct(createProductDto);
   }
 

@@ -19,6 +19,22 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: any) {
     const user = await this.usersService.findOne(payload.sub);
-    return user;
+    if (!user) {
+      throw new UnauthorizedException('Usuario no encontrado');
+    }
+
+    // Verificar si el usuario tiene acceso a la caseta del token
+    const hasAccess = user.boothMembers?.some(
+      (member) => member.booth.id === payload.boothId,
+    );
+
+    if (!hasAccess) {
+      throw new UnauthorizedException('No tienes acceso a esta caseta');
+    }
+
+    return {
+      ...user,
+      boothId: payload.boothId,
+    };
   }
 }

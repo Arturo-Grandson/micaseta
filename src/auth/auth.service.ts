@@ -65,6 +65,7 @@ export class AuthService {
       email: user.email,
       sub: user.id,
       boothId: loginDto.boothId,
+      roles: user.roles,
     };
 
     // Crear un access token

@@ -1,4 +1,4 @@
-
+import { BoothMember } from '@/booth/entities/booth-member.entity';
 
 export class UserResponseDto {
   id: number;
@@ -7,5 +7,5 @@ export class UserResponseDto {
   lastname: string;
   email: string;
   phone?: string;
-  
+  boothMembers?: BoothMember[];
 }

@@ -20,54 +20,95 @@ export class ProductService {
   ) {}
 
   async findAllProductsByBoothId(boothId: number): Promise<Product[]> {
-    const products = await this.productRepo.find({
-      where: {
-        booth: { id: boothId },
-      },
-      relations: ['price'],
-    });
+    console.log('Buscando productos para la caseta:', boothId);
+    console.log('Tipo de boothId:', typeof boothId);
+
+    // Asegurar que boothId es un número
+    const boothIdNumber = Number(boothId);
+    if (isNaN(boothIdNumber)) {
+      throw new Error(`BoothId inválido: ${boothId}`);
+    }
+
+    // Primero verificar si la caseta existe
+    const products = await this.productRepo
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.booth', 'booth')
+      .leftJoinAndSelect('product.price', 'price')
+      .where('booth.id = :boothId', { boothId: boothIdNumber })
+      .getMany();
+
+    console.log(
+      'Query SQL generada:',
+      this.productRepo
+        .createQueryBuilder('product')
+        .leftJoinAndSelect('product.booth', 'booth')
+        .leftJoinAndSelect('product.price', 'price')
+        .where('booth.id = :boothId', { boothId })
+        .getSql(),
+    );
+
+    console.log('Productos encontrados:', JSON.stringify(products, null, 2));
+    console.log('Cantidad de productos:', products.length);
 
     if (products.length === 0) {
-      throw new NotFoundException('No se encontraron productos en esta caseta');
+      console.log('No se encontraron productos para la caseta:', boothId);
+      return [];
     }
 
     return products;
   }
 
   async createProduct(createProductDto: CreateProductDto) {
+    console.log(
+      'Creando producto con datos:',
+      JSON.stringify(createProductDto, null, 2),
+    );
     const { name, type, boothId, price } = createProductDto;
 
-    console.log('Valor de price recibido:', price, typeof price);
+    // Verificar que la caseta existe
+    const product = await this.productRepo
+      .createQueryBuilder('product')
+      .where('product.name = :name', { name })
+      .andWhere('product.booth.id = :boothId', { boothId })
+      .getOne();
 
-    const existingProduct = await this.productRepo.findOne({
-      where: {
-        name,
-        booth: { id: boothId },
-      },
-    });
-
-    if (existingProduct) {
+    if (product) {
       throw new ConflictException(
         `Ya existe un producto con el nombre '${name}' en esta caseta`,
       );
     }
 
-    const product = this.productRepo.create({
+    // Crear el producto
+    const newProduct = this.productRepo.create({
       name,
       type,
       booth: { id: boothId },
     });
 
-    const savedProduct = await this.productRepo.save(product);
+    console.log('Guardando producto:', JSON.stringify(newProduct, null, 2));
+    const savedProduct = await this.productRepo.save(newProduct);
+    console.log('Producto guardado:', JSON.stringify(savedProduct, null, 2));
 
+    // Crear el precio
     const productPrice = this.productPriceRepo.create({
       price: Number(price.price),
       product: savedProduct,
     });
 
+    console.log('Guardando precio:', JSON.stringify(productPrice, null, 2));
     await this.productPriceRepo.save(productPrice);
 
-    return savedProduct;
+    // Retornar el producto con el precio
+    const productWithPrice = await this.productRepo.findOne({
+      where: { id: savedProduct.id },
+      relations: ['price', 'booth'],
+    });
+
+    console.log(
+      'Producto final con precio:',
+      JSON.stringify(productWithPrice, null, 2),
+    );
+    return productWithPrice;
   }
 
   async updateProduct(id: number, updateProductDto: UpdateProductDto) {
