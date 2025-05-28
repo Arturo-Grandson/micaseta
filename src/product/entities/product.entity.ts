@@ -23,8 +23,11 @@ export class Product {
   @Column({ type: 'enum', enum: ['drink', 'food'] })
   type: string;
 
-  @ManyToOne(() => Booth, (b) => b.products)
+  @ManyToOne(() => Booth, (b) => b.products, { nullable: false })
   booth: Booth;
+
+  @Column()
+  boothId: number;
 
   @OneToOne(() => ProductPrice, (pp) => pp.product)
   price: ProductPrice;

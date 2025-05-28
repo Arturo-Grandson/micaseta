@@ -20,7 +20,8 @@ export class ProductService {
   ) {}
 
   async findAllProductsByBoothId(boothId: number): Promise<Product[]> {
-    console.log('Buscando productos para la caseta:', boothId);
+    console.log('=== Iniciando búsqueda de productos ===');
+    console.log('Caseta solicitada:', boothId);
     console.log('Tipo de boothId:', typeof boothId);
 
     // Asegurar que boothId es un número
@@ -29,21 +30,22 @@ export class ProductService {
       throw new Error(`BoothId inválido: ${boothId}`);
     }
 
-    // Primero verificar si la caseta existe
+    // Usar una consulta más específica con QueryBuilder
     const products = await this.productRepo
       .createQueryBuilder('product')
-      .leftJoinAndSelect('product.booth', 'booth')
+      .innerJoinAndSelect('product.booth', 'booth')
       .leftJoinAndSelect('product.price', 'price')
       .where('booth.id = :boothId', { boothId: boothIdNumber })
+      .orderBy('product.name', 'ASC')
       .getMany();
 
     console.log(
       'Query SQL generada:',
       this.productRepo
         .createQueryBuilder('product')
-        .leftJoinAndSelect('product.booth', 'booth')
+        .innerJoinAndSelect('product.booth', 'booth')
         .leftJoinAndSelect('product.price', 'price')
-        .where('booth.id = :boothId', { boothId })
+        .where('booth.id = :boothId', { boothId: boothIdNumber })
         .getSql(),
     );
 
@@ -83,6 +85,7 @@ export class ProductService {
       name,
       type,
       booth: { id: boothId },
+      boothId: boothId, // Asegurarnos de que se establece el boothId directamente
     });
 
     console.log('Guardando producto:', JSON.stringify(newProduct, null, 2));
