@@ -7,28 +7,29 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import * as bcrypt from 'bcrypt';
 import { UserResponseDto } from './dto/user-response.dto';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { email, password } = createUserDto;
 
-    // Verificar si el usuario ya existe
     const existingUser = await this.usersRepository.findOne({
       where: { email },
     });
+
     if (existingUser) {
       throw new ConflictException('El email ya está registrado');
     }
 
-    // Hash de la contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = this.usersRepository.create({
@@ -43,34 +44,30 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  async findUsersByBoothId(boothId: number): Promise<User[]> {
-    const users = await this.usersRepository
-      .createQueryBuilder('user')
-      .innerJoin('user.boothMembers', 'boothMember')
-      .innerJoin('boothMember.booth', 'booth')
-      .where('booth.id = :boothId', { boothId })
-      .getMany();
-
-    return users;
-  }
-
   async findOne(id: number): Promise<UserResponseDto> {
     const user = await this.usersRepository.findOne({
-      where: { id: id },
+      where: { id },
       relations: ['boothMembers', 'boothMembers.booth'],
     });
+
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');
     }
+
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword as UserResponseDto;
   }
 
   async findByEmail(email: string): Promise<User> {
-    const user = await this.usersRepository.findOne({ where: { email } });
+    const user = await this.usersRepository.findOne({
+      where: { email },
+      relations: ['boothMembers', 'boothMembers.booth'],
+    });
+
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');
     }
+
     return user;
   }
 
@@ -79,20 +76,32 @@ export class UsersService {
       where: { email },
       relations: ['boothMembers', 'boothMembers.booth'],
     });
+
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');
     }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       throw new NotFoundException('Credenciales inválidas');
     }
 
-    // No validamos las casetas aquí, eso lo hace el AuthService
     return user;
   }
 
-  async getUserBooths(userId: number): Promise<any[]> {
+  async findUsersByBoothId(boothId: number): Promise<User[]> {
+    return this.usersRepository.find({
+      where: {
+        boothMembers: {
+          booth: { id: boothId },
+        },
+      },
+      relations: ['boothMembers', 'boothMembers.booth'],
+    });
+  }
+
+  async getUserBooths(userId: number) {
     const user = await this.usersRepository.findOne({
       where: { id: userId },
       relations: ['boothMembers', 'boothMembers.booth'],
@@ -106,5 +115,65 @@ export class UsersService {
       id: member.booth.id,
       name: member.booth.name,
     }));
+  }
+
+  async selectBooth(userId: number, boothId: number): Promise<any> {
+    console.log('Debug selectBooth - Entrada:', { userId, boothId });
+
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['boothMembers', 'boothMembers.booth'],
+    });
+
+    console.log('Debug selectBooth - Usuario encontrado:', {
+      userId: user?.id,
+      boothMembers: user?.boothMembers?.map((m) => ({
+        id: m.booth.id,
+        name: m.booth.name,
+      })),
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    const hasBooth = user.boothMembers.some(
+      (member) => member.booth.id === boothId,
+    );
+
+    console.log('Debug selectBooth - Validación de caseta:', {
+      boothId,
+      hasBooth,
+      userBooths: user.boothMembers.map((m) => m.booth.id),
+    });
+
+    if (!hasBooth) {
+      throw new NotFoundException('No tienes acceso a esta caseta');
+    }
+
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      boothId: boothId,
+    };
+
+    const accessToken = this.jwtService.sign(payload);
+
+    return {
+      statusCode: 200,
+      success: true,
+      data: {
+        boothId: boothId,
+        access_token: accessToken,
+        user: {
+          id: user.id,
+          name: user.name,
+          lastname: user.lastname,
+          email: user.email,
+          phone: user.phone,
+        },
+      },
+      message: 'Caseta seleccionada correctamente',
+    };
   }
 }

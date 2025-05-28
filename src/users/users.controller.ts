@@ -7,6 +7,7 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { SelectBoothDto } from './dto/select-booth.dto';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -83,5 +84,21 @@ export class UsersController {
   })
   async getUserBooths(@Request() req) {
     return this.usersService.getUserBooths(req.user.id);
+  }
+
+  @Post('booth/select')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Seleccionar una caseta para el usuario' })
+  @ApiResponse({
+    status: 200,
+    description: 'Caseta seleccionada exitosamente',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No autorizado - El usuario no tiene acceso a esta caseta',
+  })
+  async selectBooth(@Request() req, @Body() selectBoothDto: SelectBoothDto) {
+    return this.usersService.selectBooth(req.user.id, selectBoothDto.boothId);
   }
 }

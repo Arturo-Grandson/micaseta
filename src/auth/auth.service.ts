@@ -33,12 +33,31 @@ export class AuthService {
 
     // Si no se proporcionó boothId, devolver la lista de casetas disponibles
     if (!loginDto.boothId) {
+      // Crear los tokens incluso cuando se necesita seleccionar caseta
+      const payload = {
+        email: user.email,
+        sub: user.id,
+      };
+
+      const accessToken = this.jwtService.sign(payload);
+      const refreshTokenEntity =
+        await this.tokensService.createRefreshToken(user);
+
       throw new UnauthorizedException({
         message: 'Por favor, selecciona una caseta para continuar',
         booths: user.boothMembers.map((member) => ({
           id: member.booth.id,
           name: member.booth.name,
         })),
+        access_token: accessToken,
+        refresh_token: refreshTokenEntity.token,
+        user: {
+          id: user.id,
+          name: user.name,
+          lastname: user.lastname,
+          email: user.email,
+          phone: user.phone,
+        },
       });
     }
 
